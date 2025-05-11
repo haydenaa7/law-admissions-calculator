@@ -1,1 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Law School Admissions Calculator</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; background-color: #f0f2f5; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding-top: 20px; padding-bottom: 20px;}
+        .container { background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
+        h1 { text-align: center; color: #1d2129; margin-bottom: 25px; font-size: 24px; }
+        label { display: block; margin-top: 15px; margin-bottom: 5px; color: #4b4f56; font-weight: 600; font-size: 14px;}
+        input[type="text"], input[type="number"], select {
+            width: 100%; padding: 10px; margin-top: 3px; border: 1px solid #ccd0d5; border-radius: 6px; box-sizing: border-box; font-size: 14px;
+        }
+        input[type="checkbox"] { margin-right: 8px; vertical-align: middle; width: 16px; height: 16px; }
+        .checkbox-group { margin-top: 15px; display: flex; align-items: center;}
+        .checkbox-label { color: #4b4f56; font-weight: normal; margin: 0; font-size: 14px;}
+        button {
+            background-color: #1877f2; color: white; padding: 12px 20px; border: none; border-radius: 6px;
+            cursor: pointer; font-size: 16px; display: block; width: 100%; margin-top: 30px; font-weight: 600;
+        }
+        button:hover { background-color: #166fe5; }
+        #results { margin-top: 30px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 6px; background-color: #f9f9f9; }
+        #results h2 { margin-top: 0; color: #1d2129; font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 15px;}
+        .loading { text-align: center; font-style: italic; color: #777; }
+        .error { color: #fa383e; font-weight: bold; }
+        .probability-bar-container { width: 100%; background-color: #e9ebee; border-radius: 4px; overflow: hidden; margin-bottom: 8px; height: 22px;}
+        .probability-bar {
+            height: 100%; line-height: 22px; color: white; text-align: right; padding-right: 8px; box-sizing: border-box;
+            font-size: 0.85em; font-weight: 500; white-space: nowrap; overflow: hidden;
+        }
+        .accepted-bar { background-color: #42b72a; } /* Green */
+        .rejected-bar { background-color: #f02849; } /* Red */
+        .waitlisted-bar { background-color: #f7b928; color: #333 } /* Yellow */
+        .outcome-text { font-size: 1.1em; margin-bottom: 15px !important;}
+        .result-item p { margin: 5px 0 10px 0; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Law School Admissions Calculator</h1>
+        <form id="admissionForm">
+            <label for="year">Year Applied (YYYY):</label>
+            <input type="number" id="year" name="year" value="2024" required>
 
+            <label for="month">Month Applied (1-12):</label>
+            <input type="number" id="month" name="month" value="9" min="1" max="12" required>
+
+            <label for="day">Day Applied (1-31):</label>
+            <input type="number" id="day" name="day" value="25" min="1" max="31" required>
+
+            <label for="lsat">LSAT Score:</label>
+            <input type="number" id="lsat" name="lsat" value="172" required>
+
+            <label for="gpa">LSAC GPA (leave blank if N/A):</label>
+            <input type="text" id="gpa" name="gpa" value="3.83" placeholder="e.g., 3.83">
+
+            <label for="school_name">School Name:</label>
+            <select id="school_name" name="school_name" required>
+                <option value="">Loading schools...</option>
+            </select>
+
+            <label for="softs">Softs (Extracurriculars/Work Experience):</label>
+            <select id="softs" name="softs" required>
+                <option value="T1">T1 (Highest Tier)</option>
+                <option value="T2">T2</option>
+                <option value="T3" selected>T3</option>
+                <option value="T4">T4 (Lowest Tier)</option>
+            </select>
+
+            <label for="years_out">Years Out of College (0 if KJD, leave blank if N/A):</label>
+            <input type="text" id="years_out" name="years_out" value="8" placeholder="e.g., 0 or 8">
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="is_in_state" name="is_in_state">
+                <label for="is_in_state" class="checkbox-label">In State Applicant?</label>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="is_fee_waived" name="is_fee_waived">
+                <label for="is_fee_waived" class="checkbox-label">Application Fee Waived?</label>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="urm" name="urm" checked>
+                <label for="urm" class="checkbox-label">Underrepresented Minority (URM)?</label>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="non_trad" name="non_trad">
+                <label for="non_trad" class="checkbox-label">Nontraditional Applicant?</label>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="is_international" name="is_international">
+                <label for="is_international" class="checkbox-label">International Student?</label>
+            </div>
+
+            <label for="international_gpa">International GPA (if applicable):</label>
+            <select id="international_gpa" name="international_gpa">
+                <option value="nan" selected>N/A or Not International</option>
+                <option value="Superior">Superior</option>
+                <option value="Above Average">Above Average</option>
+                <option value="Average">Average</option>
+                <option value="Below Average">Below Average</option>
+            </select>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="is_military" name="is_military">
+                <label for="is_military" class="checkbox-label">Military Service?</label>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="is_character_and_fitness_issues" name="is_character_and_fitness_issues">
+                <label for="is_character_and_fitness_issues" class="checkbox-label">Character and Fitness Issues?</label>
+            </div>
+
+            <button type="submit">Calculate Chances</button>
+        </form>
+
+        <div id="results">
+            <!-- Prediction results will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        const schoolSelect = document.getElementById('school_name');
+        const resultsDiv = document.getElementById('results');
+        const admissionForm = document.getElementById('admissionForm');
+
+        // Function to fetch and populate schools
+        async function populateSchools() {
+            try {
+                // Assuming your Vercel function is at /api/predict and handles GET for schools
+                const response = await fetch('/api/predict'); // Or a dedicated /api/schools endpoint
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                const schools = data.available_schools || []; // Expecting { available_schools: [...] }
+                
+                schoolSelect.innerHTML = '<option value="">Select a School</option>'; // Clear loading/default
+                if (schools.length > 0) {
+                    schools.forEach(school => {
+                        const option = document.createElement('option');
+                        option.value = school;
+                        option.textContent = school;
+                        if (school === 'University of California—Los Angeles') { // Default example
+                            option.selected = true;
+                        }
+                        schoolSelect.appendChild(option);
+                    });
+                } else {
+                    schoolSelect.innerHTML = '<option value="">No schools available</option>';
+                    console.warn("No schools loaded from backend.");
+                }
+            } catch (error) {
+                console.error('Failed to load schools:', error);
+                schoolSelect.innerHTML = '<option value="">Error loading schools</option>';
+            }
+        }
+        
+        // Populate schools on page load
+        document.addEventListener('DOMContentLoaded', populateSchools);
+
+
+        admissionForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            resultsDiv.innerHTML = '<p class="loading">Calculating...</p>';
+
+            const formData = new FormData(this);
+            const data = {};
+            formData.forEach((value, key) => {
+                const element = this.elements[key];
+                if (element.type === 'checkbox') {
+                    data[key] = element.checked;
+                } else if ((element.id === 'gpa' || element.id === 'years_out') && value === '') {
+                    data[key] = "nan"; // Send "nan" for backend to interpret as np.nan
+                } else if (element.id === 'international_gpa' && value === 'nan'){
+                     data[key] = "nan"; // Explicitly "nan" for international GPA N/A
+                }
+                 else {
+                    data[key] = value;
+                }
+            });
+            
+            console.log("Sending data:", JSON.stringify(data));
+
+            try {
+                const response = await fetch('/api/predict', { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json(); // Try to parse JSON regardless of ok status for error messages
+
+                if (!response.ok) {
+                    throw new Error(result.error || `Server error: ${response.status}`);
+                }
+                
+                console.log("Received result:", result);
+                displayResults(result);
+
+            } catch (error) {
+                console.error('Error:', error);
+                resultsDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        });
+
+        function displayResults(result) {
+            let BOLD = "font-weight: bold;";
+            let colorStyle = "";
+
+            let outcomeText = result.most_likely_outcome;
+            if (outcomeText === 'Accepted') { colorStyle = "color: #42b72a;"; }
+            else if (outcomeText === 'Rejected') { colorStyle = "color: #f02849;"; }
+            else if (outcomeText === 'Waitlist') { 
+                colorStyle = "color: #f7b928;"; 
+                outcomeText = 'Waitlisted'; // User-friendly term
+            }
+            
+            let html = `<h2>Prediction for ${result.school_name}</h2>`;
+            html += `<p class="outcome-text">According to your profile, you are most likely to be <span style="${BOLD}${colorStyle}">${outcomeText}</span>.</p>`;
+            
+            const probabilities = result.probabilities;
+            const outcomeOrder = ['Accepted', 'Rejected', 'Waitlist']; // Desired display order
+
+            html += '<div class="result-item">';
+            outcomeOrder.forEach(outcome => {
+                if (probabilities.hasOwnProperty(outcome)) {
+                    const percentage = (probabilities[outcome] * 100);
+                    const displayPercentage = percentage.toFixed(2);
+                    let barClass = '';
+                    let outcomeDisplay = outcome;
+                    if (outcome === 'Accepted') barClass = 'accepted-bar';
+                    else if (outcome === 'Rejected') barClass = 'rejected-bar';
+                    else if (outcome === 'Waitlist') {
+                        barClass = 'waitlisted-bar';
+                        outcomeDisplay = 'Waitlisted';
+                    }
+
+                    html += `<p>${outcomeDisplay}: ${displayPercentage}%</p>`;
+                    html += `<div class="probability-bar-container">`;
+                    html += `  <div class="probability-bar ${barClass}" style="width: ${Math.max(percentage, 0.5)}%;">${displayPercentage}%</div>`; // Min width for visibility
+                    html += `</div>`;
+                }
+            });
+            html += '</div>';
+            resultsDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
