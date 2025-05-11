@@ -1,5 +1,5 @@
 # backend_service/app.py
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 import pandas as pd
 import numpy as np
@@ -15,6 +15,10 @@ CORS(app, resources={
     r"/predict": {"origins": ["https://your-vercel-app-xxxx.vercel.app", "http://localhost:5500", "http://127.0.0.1:5500"]},
     r"/schools": {"origins": ["https://your-vercel-app-xxxx.vercel.app", "http://localhost:5500", "http://127.0.0.1:5500"]}
 }) # Adjust port if your local Vercel dev server runs elsewhere
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({"status": "ok"}), 200
 
 # Correct path to model artifacts within the backend_service directory
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
