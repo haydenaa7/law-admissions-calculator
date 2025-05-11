@@ -1,0 +1,9 @@
+# backend_service/requirements.txt
+Flask>=2.0
+Flask-CORS>=3.0
+gunicorn>=20.0 # Production WSGI server, Render often uses this
+pandas
+numpy<2.0
+scikit-learn==1.3.2 # Or the version you settled on
+joblib
+scipy
