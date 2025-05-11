@@ -1,21 +1,26 @@
 # backend_service/Dockerfile
 FROM python:3.10-slim
 
-WORKDIR /app
+# Set a working directory inside the image
+WORKDIR /deploy_space 
 
-# Copy requirements first to leverage Docker cache
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy the backend_service's requirements.txt into the WORKDIR
+COPY ./backend_service/requirements.txt /deploy_space/requirements.txt
 
-# Copy the rest of the backend application code and model artifacts
-COPY . .
+# Install dependencies
+RUN pip install --no-cache-dir -r /deploy_space/requirements.txt
 
-# Expose the port the app runs on (Gunicorn will use this)
-# Render will automatically set the PORT environment variable.
-# We don't strictly need to EXPOSE here as Render handles it, but it's good practice.
-# EXPOSE $PORT 
+# Copy the entire backend_service directory (from the build context which is project root)
+# into a directory named 'backend_service' INSIDE the WORKDIR.
+# So, you'll have /deploy_space/backend_service/app.py, etc.
+COPY ./backend_service /deploy_space/backend_service
 
-# Command to run the application using Gunicorn
-# Render provides the $PORT variable.
-# The number of workers can be adjusted.
-CMD gunicorn --bind "0.0.0.0:$PORT" app:app
+# Set PYTHONPATH: Add /deploy_space to Python's import search path.
+# This allows Python to find the 'backend_service' package inside /deploy_space.
+ENV PYTHONPATH="/deploy_space:${PYTHONPATH}"
+
+# Command to run Gunicorn:
+# Gunicorn will run from /deploy_space (due to WORKDIR).
+# It needs to load the 'app' object from the 'app' module
+# within the 'backend_service' package.
+CMD gunicorn --bind "0.0.0.0:$PORT" backend_service.app:app
