@@ -13,6 +13,10 @@ from sklearn.metrics import classification_report, confusion_matrix, ConfusionMa
 import matplotlib.pyplot as plt
 import joblib
 import os
+
+project_root = os.path.dirname(os.path.abspath(__file__))
+if project_root not in sys.path: # To avoid duplicate entries if run multiple times
+    sys.path.insert(0, project_root)
 from backend_service.custom_transformers import cast_to_object, cast_to_bool, cast_to_string
 
 # Load dataset
