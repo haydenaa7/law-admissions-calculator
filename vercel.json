@@ -1,1 +1,28 @@
-
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "api/predict.py",
+            "use": "@vercel/python",
+            "config": {
+                "maxLambdaSize": "50mb" 
+            }
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/predict",
+            "dest": "api/predict.py"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "public/$1" 
+        }
+    ],
+    "functions": {
+        "api/predict.py": {
+            "memory": 1024,    
+            "maxDuration": 20  
+        }
+    }
+}
