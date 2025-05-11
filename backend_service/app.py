@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import joblib
 import os
+from custom_transformers import cast_to_object, cast_to_bool, cast_to_string
 
 app = Flask(__name__)
 # Configure CORS: Allow requests from your Vercel domain and localhost for testing
