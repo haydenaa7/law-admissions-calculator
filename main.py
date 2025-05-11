@@ -13,32 +13,7 @@ from sklearn.metrics import classification_report, confusion_matrix, ConfusionMa
 import matplotlib.pyplot as plt
 import joblib
 import os
-
-# --- Define functions for FunctionTransformer ---
-def cast_to_object(X):
-    return X.astype(object)
-
-def cast_to_bool(X):
-    def convert_element(val):
-        if isinstance(val, str):
-            return val.lower() in ['true', '1', 'yes', 't']
-        return bool(val)
-    
-    if isinstance(X, pd.DataFrame): # Ensure input is DataFrame to use .applymap
-        return X.apply(lambda s: s.map(convert_element) if isinstance(s, pd.Series) else [convert_element(v) for v in s], axis=0).astype(bool)
-    elif isinstance(X, pd.Series):
-        return X.map(convert_element).astype(bool)
-    elif isinstance(X, np.ndarray): # If it's a NumPy array
-        if X.ndim == 1:
-            return np.array([convert_element(val) for val in X], dtype=bool)
-        else: # 2D
-            return np.array([[convert_element(val) for val in row] for row in X], dtype=bool)
-    else: # Fallback for other types, though less likely from pipeline
-        return pd.Series(X).map(convert_element).astype(bool).to_numpy()
-
-
-def cast_to_string(X):
-    return X.astype(str)
+from backend_service.custom_transformers import cast_to_object, cast_to_bool, cast_to_string
 
 # Load dataset
 df = pd.read_csv('lsdata1.csv', low_memory=False)
