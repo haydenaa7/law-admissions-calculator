@@ -18,4 +18,4 @@ COPY . .
 # Command to run the application using Gunicorn
 # Render provides the $PORT variable.
 # The number of workers can be adjusted.
-CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "app:app"]
+CMD gunicorn --bind "0.0.0.0:$PORT" app:app
