@@ -128,24 +128,26 @@
         const resultsDiv = document.getElementById('results');
         const admissionForm = document.getElementById('admissionForm');
 
-        // Function to fetch and populate schools
+        // THIS IS THE LINE YOU WILL MODIFY
+        const RENDER_BACKEND_URL = 'https://law-admissions-calculator.onrender.com'; // Placeholder
+
         async function populateSchools() {
             try {
-                // Assuming your Vercel function is at /api/predict and handles GET for schools
-                const response = await fetch('/api/predict'); // Or a dedicated /api/schools endpoint
+                // USES RENDER_BACKEND_URL
+                const response = await fetch(`${RENDER_BACKEND_URL}/schools`);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP error! status: ${response.status} when fetching schools.`);
                 }
                 const data = await response.json();
-                const schools = data.available_schools || []; // Expecting { available_schools: [...] }
+                const schools = data.available_schools || [];
                 
-                schoolSelect.innerHTML = '<option value="">Select a School</option>'; // Clear loading/default
+                schoolSelect.innerHTML = '<option value="">Select a School</option>';
                 if (schools.length > 0) {
                     schools.forEach(school => {
                         const option = document.createElement('option');
                         option.value = school;
                         option.textContent = school;
-                        if (school === 'University of California—Los Angeles') { // Default example
+                        if (school === 'University of California—Los Angeles') {
                             option.selected = true;
                         }
                         schoolSelect.appendChild(option);
@@ -156,13 +158,11 @@
                 }
             } catch (error) {
                 console.error('Failed to load schools:', error);
-                schoolSelect.innerHTML = '<option value="">Error loading schools</option>';
+                schoolSelect.innerHTML = `<option value="">Error loading schools: ${error.message}</option>`;
             }
         }
         
-        // Populate schools on page load
         document.addEventListener('DOMContentLoaded', populateSchools);
-
 
         admissionForm.addEventListener('submit', async function(event) {
             event.preventDefault();
@@ -175,19 +175,20 @@
                 if (element.type === 'checkbox') {
                     data[key] = element.checked;
                 } else if ((element.id === 'gpa' || element.id === 'years_out') && value === '') {
-                    data[key] = "nan"; // Send "nan" for backend to interpret as np.nan
+                    data[key] = "nan";
                 } else if (element.id === 'international_gpa' && value === 'nan'){
-                     data[key] = "nan"; // Explicitly "nan" for international GPA N/A
+                     data[key] = "nan";
                 }
                  else {
                     data[key] = value;
                 }
             });
             
-            console.log("Sending data:", JSON.stringify(data));
+            console.log("Sending data to backend:", JSON.stringify(data));
 
             try {
-                const response = await fetch('/api/predict', { 
+                // USES RENDER_BACKEND_URL
+                const response = await fetch(`${RENDER_BACKEND_URL}/predict`, { 
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -195,17 +196,17 @@
                     body: JSON.stringify(data)
                 });
 
-                const result = await response.json(); // Try to parse JSON regardless of ok status for error messages
+                const result = await response.json(); 
 
                 if (!response.ok) {
                     throw new Error(result.error || `Server error: ${response.status}`);
                 }
                 
-                console.log("Received result:", result);
+                console.log("Received result from backend:", result);
                 displayResults(result);
 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error during prediction fetch:', error);
                 resultsDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
             }
         });
@@ -219,14 +220,14 @@
             else if (outcomeText === 'Rejected') { colorStyle = "color: #f02849;"; }
             else if (outcomeText === 'Waitlist') { 
                 colorStyle = "color: #f7b928;"; 
-                outcomeText = 'Waitlisted'; // User-friendly term
+                outcomeText = 'Waitlisted';
             }
             
             let html = `<h2>Prediction for ${result.school_name}</h2>`;
             html += `<p class="outcome-text">According to your profile, you are most likely to be <span style="${BOLD}${colorStyle}">${outcomeText}</span>.</p>`;
             
             const probabilities = result.probabilities;
-            const outcomeOrder = ['Accepted', 'Rejected', 'Waitlist']; // Desired display order
+            const outcomeOrder = ['Accepted', 'Rejected', 'Waitlist'];
 
             html += '<div class="result-item">';
             outcomeOrder.forEach(outcome => {
@@ -244,7 +245,7 @@
 
                     html += `<p>${outcomeDisplay}: ${displayPercentage}%</p>`;
                     html += `<div class="probability-bar-container">`;
-                    html += `  <div class="probability-bar ${barClass}" style="width: ${Math.max(percentage, 0.5)}%;">${displayPercentage}%</div>`; // Min width for visibility
+                    html += `  <div class="probability-bar ${barClass}" style="width: ${Math.max(percentage, 0.5)}%;">${displayPercentage}%</div>`;
                     html += `</div>`;
                 }
             });
