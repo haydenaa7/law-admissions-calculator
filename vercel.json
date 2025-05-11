@@ -5,7 +5,9 @@
             "src": "api/predict.py",
             "use": "@vercel/python",
             "config": {
-                "maxLambdaSize": "50mb" 
+                "maxLambdaSize": "50mb",
+                "memory": 1024,
+                "maxDuration": 20
             }
         }
     ],
@@ -16,13 +18,7 @@
         },
         {
             "src": "/(.*)",
-            "dest": "public/$1" 
+            "dest": "public/$1"
         }
-    ],
-    "functions": {
-        "api/predict.py": {
-            "memory": 1024,    
-            "maxDuration": 20  
-        }
-    }
+    ]
 }
