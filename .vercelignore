@@ -1,0 +1,18 @@
+# .vercelignore
+
+# Files and folders for local development/training, not for deployment
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.DS_Store
+.ipynb_checkpoints/
+main.py # If main.py is ONLY for training and not part of the API
+lsdata1.csv # Data files are not needed by the API once model is trained
+lsdata2.csv
+model_artifacts/confusion_matrix.png # The plot is not needed by the API
+
+# Potentially exclude matplotlib if it's being bundled unnecessarily
+# This is a bit more advanced and might require inspecting the build output
+# or if you know for sure it's not used by the API function.
+# /vercel/output/functions/api/predict.py/matplotlib/ # (Path would be specific to Vercel's build)
