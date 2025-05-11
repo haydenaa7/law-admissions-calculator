@@ -3,6 +3,7 @@
 This is a machine learning-based calculator for law admissions. Download the following files to use.
 
 main.ipynb: the code file, written in Python using Jupyter Notebook.
+
 lsdata1.csv, lsdata2.csv: the data files, split into two due to Github's file size limit.
 
 Ensure that all files are in the same directory. You may run the code via localhost or a code editor
