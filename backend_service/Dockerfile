@@ -23,4 +23,4 @@ ENV PYTHONPATH="/deploy_space:${PYTHONPATH}"
 # Gunicorn will run from /deploy_space (due to WORKDIR).
 # It needs to load the 'app' object from the 'app' module
 # within the 'backend_service' package.
-CMD gunicorn --bind "0.0.0.0:$PORT" backend_service.app:app
+CMD gunicorn --bind "0.0.0.0:$PORT" --timeout 120 backend_service.app:app
