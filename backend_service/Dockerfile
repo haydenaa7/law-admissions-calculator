@@ -1,5 +1,5 @@
 # backend_service/Dockerfile
-FROM python:3.10-slim # Use the Python version you used for training
+FROM python:3.10-slim
 
 WORKDIR /app
 
