@@ -13,6 +13,7 @@ from sklearn.metrics import classification_report, confusion_matrix, ConfusionMa
 import matplotlib.pyplot as plt
 import joblib
 import os
+import sys
 
 project_root = os.path.dirname(os.path.abspath(__file__))
 if project_root not in sys.path: # To avoid duplicate entries if run multiple times
