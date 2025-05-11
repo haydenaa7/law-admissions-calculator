@@ -1,6 +1,6 @@
 # backend_service/app.py
 from flask import Flask, request, jsonify, make_response
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import pandas as pd
 import numpy as np
 import joblib
@@ -12,8 +12,8 @@ app = Flask(__name__)
 # Replace 'https://your-vercel-app-xxxx.vercel.app' with your actual Vercel URL after deployment
 # For development, you might use '*' but be more specific for production.
 CORS(app, resources={
-    r"/predict": {"origins": ["https://your-vercel-app-xxxx.vercel.app", "http://localhost:5500", "http://127.0.0.1:5500"]},
-    r"/schools": {"origins": ["https://your-vercel-app-xxxx.vercel.app", "http://localhost:5500", "http://127.0.0.1:5500"]}
+    r"/predict": {"origins": "https://law-admissions-calculator.vercel.app"},
+    r"/schools": {"origins": "https://law-admissions-calculator.vercel.app"}
 }) # Adjust port if your local Vercel dev server runs elsewhere
 
 @app.route('/health', methods=['GET'])
