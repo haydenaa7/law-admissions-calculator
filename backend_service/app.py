@@ -32,30 +32,36 @@ def load_dependencies():
     global model, model_classes, top_schools_list
     try:
         if model is None:
-            print(f"Loading model from {MODEL_PATH}...")
+            print(f"Attempting to load model from {MODEL_PATH}...")
             if not os.path.exists(MODEL_PATH):
+                print(f"CRITICAL: Model file not found at {MODEL_PATH}") # More prominent
                 raise FileNotFoundError(f"Model file not found at {MODEL_PATH}")
             model = joblib.load(MODEL_PATH)
-            print("Model loaded.")
+            print("Model successfully loaded.") # Confirmation
 
         if model_classes is None:
-            print(f"Loading model classes from {MODEL_CLASSES_PATH}...")
+            print(f"Attempting to load model classes from {MODEL_CLASSES_PATH}...")
             if not os.path.exists(MODEL_CLASSES_PATH):
+                print(f"CRITICAL: Classes file not found at {MODEL_CLASSES_PATH}")
                 raise FileNotFoundError(f"Classes file not found at {MODEL_CLASSES_PATH}")
             model_classes = joblib.load(MODEL_CLASSES_PATH)
-            print("Model classes loaded.")
+            print("Model classes successfully loaded.")
 
         if top_schools_list is None:
-            print(f"Loading top schools from {TOP_SCHOOLS_PATH}...")
+            print(f"Attempting to load top schools from {TOP_SCHOOLS_PATH}...")
             if not os.path.exists(TOP_SCHOOLS_PATH):
+                print(f"CRITICAL: Schools file not found at {TOP_SCHOOLS_PATH}")
                 raise FileNotFoundError(f"Schools file not found at {TOP_SCHOOLS_PATH}")
             top_schools_list = joblib.load(TOP_SCHOOLS_PATH)
-            print("Top schools list loaded.")
+            print("Top schools list successfully loaded.")
+        
+        print("All dependencies in load_dependencies loaded successfully.")
+
     except Exception as e:
-        print(f"Error loading dependencies: {e}")
-        # Depending on Render's setup, you might want the app to fail loudly here
-        # or handle it gracefully in the request. For now, we print.
-        raise # Re-raise to potentially stop app startup if critical files are missing
+        print(f"FATAL ERROR during load_dependencies: {e}")
+        import traceback
+        traceback.print_exc() # Print full traceback
+        raise
 
 load_dependencies() # Load on application startup
 
