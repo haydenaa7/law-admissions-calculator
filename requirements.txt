@@ -1,0 +1,5 @@
+# requirements.txt
+pandas
+numpy
+scikit-learn==1.6.0
+joblib
